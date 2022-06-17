@@ -24,6 +24,8 @@ class Atendimento {
     const existemErros = erros.length
     if(existemErros) {
       res.status(400).json(erros)
+      console.log(dataCriacao)
+
     } else {
       const atendimentoDatado = {...atendimento, data, dataCriacao}
       const sql = 'INSERT INTO atendimentos SET ?'
@@ -31,7 +33,7 @@ class Atendimento {
         if(erro) {
           res.status(400).json(erro)
         } else {
-          res.status(200).json(resultados)
+          res.status(200).json(atendimento)
         }
       })  
     }
@@ -54,6 +56,29 @@ class Atendimento {
       } else {
         const atendimento = resultados[0]
         res.status(200).json(atendimento)
+      }
+    })
+  }
+  altera(id, valores, res) {
+    const sql = `UPDATE Atendimentos SET ? WHERE id=?`
+    if(valores.data) {
+      valores.data = moment(new Date()).format('YYYY-MM-DD HH:MM:SS')
+    }
+    conexao.query(sql, [valores, id], (erro, resultados) => {
+      if(erro) {
+        res.status(400).json(erro)
+      } else {
+        res.status(200).json({...valores, id})
+      }
+    })
+  }
+  deleta(id, res) {
+    const sql = `DELETE FROM Atendimentos WHERE id=?`
+    conexao.query(sql, id, (erro, resultados) => {
+      if(erro) {
+        res.status(400).json(erro)
+      } else {
+        res.status(200).json({id, mensagem: 'Deletado com sucesso'})
       }
     })
   }
